@@ -1,5 +1,6 @@
 # 🧠 Resume Classifier using Hugging Face Transformers
 
+
 > Classify resumes into job roles using fine-tuned BERT models.
 
 ![header](assets/architecture.png)
@@ -42,6 +43,7 @@ Built from scratch using modern deep learning tools and structured for productio
     "Software Engineer": 8,
     "UI/UX Designer": 9
 }
+```
 
 ---
 
@@ -66,7 +68,7 @@ resume-classifier/
 │
 ├── requirements.txt
 └── README.md
-
+```
 
 🔧 Setup Instructions
 # 1. Create and activate environment
