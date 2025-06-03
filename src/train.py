@@ -21,7 +21,7 @@ def compute_metrics(eval_pred):
 def main():
     model_name = "bert-base-uncased"
     csv_path = "data/synthetic_resume_dataset.csv"
-    output_dir = "/model_output"
+    output_dir = "models"
 
     set_seed(42)
 
@@ -46,7 +46,7 @@ def main():
         learning_rate=2e-5,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
-        num_train_epochs=10,
+        num_train_epochs=15,
         weight_decay=0.01,
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
@@ -68,6 +68,10 @@ def main():
 
     trainer.train()
     print("✅ Training complete.")
+
+    # Model save
+    model.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
 
 if __name__ == "__main__":
     main()
