@@ -1,36 +1,48 @@
 import pandas as pd
+from datasets import Dataset, ClassLabel
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from datasets import Dataset
 from transformers import AutoTokenizer
 
-def load_and_preprocess_data(csv_path, model_name='bert-base-uncased', test_size=0.2):
-    # Load dataset
+def load_and_preprocess_data(csv_path, model_name, max_length=128):
+    # Load CSV
     df = pd.read_csv(csv_path)
 
-    # Encode labels to integers
-    label_encoder = LabelEncoder()
-    df['label_id'] = label_encoder.fit_transform(df['label'])
-
-    # Save label mapping for future use
-    label2id = {label: idx for idx, label in enumerate(label_encoder.classes_)}
+    # Encode labels
+    labels = sorted(df['label'].unique())
+    label2id = {label: idx for idx, label in enumerate(labels)}
     id2label = {idx: label for label, idx in label2id.items()}
+    df['label'] = df['label'].map(label2id)
 
-    # Split into train/test
-    train_df, test_df = train_test_split(df, test_size=test_size, stratify=df['label_id'], random_state=42)
+    # Train-test split
+    train_df, test_df = train_test_split(df, test_size=0.2, stratify=df['label'], random_state=42)
 
-    # Convert to Hugging Face Dataset objects
-    train_ds = Dataset.from_pandas(train_df[['text', 'label_id']])
-    test_ds = Dataset.from_pandas(test_df[['text', 'label_id']])
+    # Convert to Hugging Face Dataset
+    train_dataset = Dataset.from_pandas(train_df)
+    test_dataset = Dataset.from_pandas(test_df)
+
+    # Cast label column (optional)
+    class_label = ClassLabel(num_classes=len(label2id), names=list(label2id.keys()))
+    train_dataset = train_dataset.cast_column("label", class_label)
+    test_dataset = test_dataset.cast_column("label", class_label)
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    def tokenize_function(example):
-        return tokenizer(example['text'], padding='max_length', truncation=True)
+    # Tokenization function
+    def preprocess_function(example):
+        return tokenizer(
+            example["text"],
+            padding="max_length",
+            truncation=True,
+            max_length=max_length
+        )
 
     # Apply tokenization
-    train_ds = train_ds.map(tokenize_function, batched=True)
-    test_ds = test_ds.map(tokenize_function, batched=True)
+    tokenized_train = train_dataset.map(preprocess_function, batched=True)
+    tokenized_test = test_dataset.map(preprocess_function, batched=True)
 
-    return train_ds, test_ds, label2id, id2label
+    # Remove original text columns
+    tokenized_train = tokenized_train.remove_columns(["text", "__index_level_0__"])
+    tokenized_test = tokenized_test.remove_columns(["text", "__index_level_0__"])
+
+    return tokenized_train, tokenized_test, label2id, id2label
