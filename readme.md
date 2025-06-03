@@ -43,6 +43,11 @@ Built from scratch using modern deep learning tools and structured for productio
     "UI/UX Designer": 9
 }
 
+---
+
+## 🗂️ Label Mapping
+
+```css
 resume-classifier/
 ├── assets/
 │   ├── architecture.png
@@ -63,6 +68,7 @@ resume-classifier/
 └── README.md
 
 
+🔧 Setup Instructions
 # 1. Create and activate environment
 python -m venv venv
 source venv/bin/activate  # or .\venv\Scripts\activate on Windows
@@ -75,3 +81,38 @@ python src/train.py
 
 # 4. Run inference
 python src/inference.py "I developed APIs and deployed scalable systems in AWS."
+
+
+🧪 Inference Example
+
+🧠 Predicted Label: DevOps Engineer
+🔒 Confidence: 0.91
+
+📊 Training Performance
+| Epoch | Validation Accuracy |
+| ----- | ------------------- |
+| 1     | 0.15                |
+| 10    | 0.75 ✅              |
+
+💡 Dataset Source
+This project uses a synthetic resume dataset (created locally) with 10 distinct job roles. You can find it in data/synthetic_resume_dataset.csv.
+
+🛠️ Requirements
+
+Python 3.11+
+transformers>=4.40.0
+datasets
+scikit-learn
+torch
+pandas
+
+🧑‍💻 Author
+This project was developed to demonstrate hands-on expertise in:
+Hugging Face Transformers
+Resume classification using NLP
+Dataset preprocessing, training, evaluation, and deployment
+
+🤝 Contact
+If you're interested in working together or want a similar solution:
+📧 your.email@example.com
+💼 Upwork Profile
